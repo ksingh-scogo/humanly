@@ -1,403 +1,174 @@
-# humanly 🦅
+# humanly
 
-> Transform any content into authentic, value-driven social media posts
+Transform URLs, files, or text into authentic social media posts.
 
-A lightweight CLI tool that transforms URLs, files, or raw text into story-driven social media posts — no hype, no FOMO, just wisdom and insights.
-
-**Perfect for:** Founders, developers, and creators who want to share knowledge without the typical social media noise.
+A bash script that turns content into Twitter threads, LinkedIn posts, or blog articles — without the hype.
 
 ---
 
-## Features
-
-- ✨ **Multiple input types** - URLs, markdown files, raw text, or stdin
-- 🎯 **Multiple platforms** - Twitter threads, LinkedIn posts, blog articles
-- 🔄 **Refine mode** - Improve existing content iteratively
-- 🧠 **AI humanizer** - Automatically removes 24 AI writing patterns
-- 🎨 **Story-driven style** - No hype, no clickbait, pure value
-
-## Philosophy
-
-humanly helps you share valuable content in your authentic voice:
-
-- ✅ Story-driven narratives
-- ✅ Pure value and wisdom
-- ✅ Soft, simple language
-- ✅ Human tone (not corporate/robotic)
-- ❌ No hype or clickbait
-- ❌ No FOMO tactics
-- ❌ No shallow reposts
-
----
-
-## Quick Start
-
-### Installation
+## Install
 
 ```bash
-# Clone the repository
 git clone https://github.com/yourusername/humanly.git
 cd humanly
-
-# Install (adds to PATH)
 ./install.sh
 ```
 
-Or add to PATH manually:
-```bash
-export PATH="$HOME/humanly:$PATH"
-echo 'export PATH="$HOME/humanly:$PATH"' >> ~/.zshrc
-```
-
-### First Transformation
+## Use
 
 ```bash
-# Transform a URL into a Twitter thread
+# Transform a URL
 humanly "https://example.com/article" twitter
 
-# Output saved to: ./output/twitter_2026-02-01.md
+# Transform a file
+humanly notes.md linkedin
+
+# Refine existing output
+humanly output/twitter_2026-02-01.md twitter -r
+
+# Quick thought
+humanly "I learned something today..." twitter
 ```
 
-That's it! Check the output file.
+Output is saved to `./output/{platform}_YYYY-MM-DD.md`
 
 ---
 
-## Usage
-
-### Basic Syntax
+## Syntax
 
 ```bash
 humanly <input> <platform> [options]
 ```
 
-**Important:** Output filenames are **auto-generated** as `{platform}_YYYY-MM-DD.md`. You don't specify them.
+**Platforms:** `twitter` | `linkedin` | `blog` | `all`
 
-### Input Types
+**Options:**
+- `-r` - Refine/regenerate
+- `-o DIR` - Custom output directory
+- `-h` - Help
+- `-v` - Version
 
-| Type | Example | Use Case |
-|------|---------|----------|
-| **URL** | `humanly "https://..." twitter` | Transform web content |
-| **File** | `humanly notes.md linkedin` | Process existing files |
-| **Text** | `humanly "Quick thought..." twitter` | Capture ideas |
-| **Stdin** | `cat file.txt \| humanly blog` | Pipe from commands |
+**Input types:**
+- URL: `humanly "https://..." twitter`
+- File: `humanly notes.md linkedin`
+- Text: `humanly "thought" twitter`
+- Stdin: `cat file | humanly blog`
 
-### Platforms
+---
 
-| Platform | Output | Format |
-|----------|--------|--------|
-| `twitter` | `twitter_YYYY-MM-DD.md` | 3-7 tweets, 280 chars each |
-| `linkedin` | `linkedin_YYYY-MM-DD.md` | 1500-2500 chars, story-driven |
-| `blog` | `blog_YYYY-MM-DD.md` | 800-1500 words, structured |
-| `all` | All three files | Complete content suite |
+## What It Does
 
-### Options
+Transforms content into posts that:
+- Tell stories, not sell
+- Use simple language
+- Feel human-written
+- Skip the hype and FOMO
 
-| Option | Description | Example |
-|--------|-------------|---------|
-| `-r` | Refine mode (regenerate/improve) | `humanly file.md twitter -r` |
-| `-o DIR` | Custom output directory | `humanly file.md twitter -o ~/content` |
-| `-h` | Show help | `humanly -h` |
-| `-v` | Show version | `humanly -v` |
+See [STYLE_GUIDE.md](STYLE_GUIDE.md) for details.
 
 ---
 
 ## Examples
 
-### Transform a Blog Article
-```bash
-humanly "https://example.com/article" twitter
-# Creates: ./output/twitter_2026-02-01.md
+### Before (typical article)
+```
+"In today's rapidly evolving landscape, AI-assisted coding tools 
+are revolutionizing development workflows, enabling unprecedented 
+productivity gains..."
 ```
 
-### Refine Existing Content
-```bash
-humanly output/twitter_2026-02-01.md twitter -r
-# Creates: ./output/twitter_2026-02-01_refined.md
+### After (humanly Twitter thread)
+```
+1/ I added a --dry-run flag to my CLI tool on a whim. 
+Three months later, I use it almost daily.
+
+2/ You know that pause before hitting Enter on a destructive 
+command? That "wait, did I check the path?" moment?
+
+3/ --dry-run kills that anxiety. Shows what would happen, 
+without doing it. I run it reflexively now.
+...
 ```
 
-### Process Your Notes
-```bash
-humanly journal/weekly-reflection.md linkedin
-# Creates: ./output/linkedin_2026-02-01.md
-```
-
-### Quick Thought to Post
-```bash
-humanly "I learned something about debugging today..." twitter
-# Creates: ./output/twitter_2026-02-01.md
-```
-
-### Pipe from Command
-```bash
-cat notes.txt | humanly blog
-# Creates: ./output/blog_2026-02-01.md
-```
-
-### Generate All Platforms
-```bash
-humanly "https://article.com" all
-# Creates: twitter_*, linkedin_*, blog_* files
-```
-
-For detailed examples with before/after transformations, see [EXAMPLES.md](EXAMPLES.md).
-
----
-
-## Common Mistakes
-
-### ❌ Wrong: Trying to specify output filename
-```bash
-humanly input.md output.md
-```
-The second argument is the **platform**, not output filename.
-
-### ✅ Right: Let humanly auto-generate the filename
-```bash
-humanly input.md twitter
-# Auto-creates: ./output/twitter_2026-02-01.md
-```
-
-### ❌ Wrong: Missing platform
-```bash
-humanly notes.md
-```
-Always specify the platform explicitly.
-
-### ✅ Right: Explicit platform
-```bash
-humanly notes.md linkedin
-# Clear and explicit
-```
+See [EXAMPLES.md](EXAMPLES.md) for more.
 
 ---
 
 ## How It Works
 
-humanly is a bash wrapper around OpenClaw's AI agent system:
+humanly is a bash wrapper that:
+1. Reads your input (URL, file, or text)
+2. Sends transformation request to an AI agent
+3. Applies the "humanly" style (no hype, story-driven, simple)
+4. Removes common AI writing patterns
+5. Saves output to markdown file
 
-1. **You run:** `humanly <input> <platform>`
-2. **humanly creates** a request file with guidelines
-3. **OpenClaw agent:**
-   - Fetches content (if URL)
-   - Applies humanly style transformation
-   - Removes AI writing patterns (humanizer)
-4. **Output saved** to `./output/{platform}_YYYY-MM-DD.md`
-
-### The humanly Style
-
-**Story-driven:**
-- Personal observations and experiences
-- Relatable hooks that draw readers in
-- Natural narrative flow
-
-**No hype:**
-- No superlatives ("amazing", "incredible")
-- No FOMO tactics ("don't miss out")
-- No clickbait patterns
-
-**Pure value:**
-- Practical insights you can use
-- Honest reflections
-- Real-world examples
-
-**Soft language:**
-- Conversational tone
-- Simple, accessible words
-- Like talking to a wise friend over coffee
-
-For the complete style guide, see [STYLE_GUIDE.md](STYLE_GUIDE.md).
+**Requirements:**
+- [OpenClaw](https://github.com/openclaw/openclaw) running (provides the AI agent)
+- Internet connection (for URLs only)
 
 ---
 
-## Workflows
+## Common Mistakes
 
-### Daily Content Creation
+**Wrong:**
 ```bash
-# Find interesting article
-humanly "https://article.com" twitter
-
-# Review output
-cat output/twitter_2026-02-01.md
-
-# Refine if needed
-humanly output/twitter_2026-02-01.md twitter -r
-
-# Post!
+humanly input.md output.md  # Second arg is platform, not filename
+humanly notes.md            # Which platform?
 ```
 
-### Iterative Refinement
+**Right:**
 ```bash
-# First pass
-humanly "https://article.com" twitter
-
-# Refine
-humanly output/twitter_*.md twitter -r
-
-# Refine again (keep improving)
-humanly output/twitter_*_refined.md twitter -r
-```
-
-### Voice Note → Post
-```bash
-# Transcribe voice note
-whisper note.m4a --output_format txt
-
-# Transform to LinkedIn
-cat note.txt | humanly linkedin
+humanly input.md twitter    # Auto-generates filename
+humanly notes.md linkedin   # Explicit platform
 ```
 
 ---
 
-## Requirements
+## Files
 
-- **OpenClaw** gateway running (this tool communicates with the OpenClaw agent)
-- **Internet connection** (for URL fetching only)
-- **macOS or Linux** (or WSL on Windows)
-
-### Installing OpenClaw
-
-humanly requires OpenClaw to work. Install it from:
-- [OpenClaw GitHub](https://github.com/openclaw/openclaw)
-- [OpenClaw Docs](https://docs.openclaw.ai)
-
----
-
-## Configuration
-
-humanly uses OpenClaw's agent system. No additional configuration needed.
-
-The transformation guidelines are embedded in the script and sent to the OpenClaw agent with each request.
-
----
-
-## Output Format
-
-Every generated file includes:
-
-- **Title and metadata** (source, date, platform)
-- **Ready-to-post content** (formatted for the platform)
-- **Notes** (transformation details)
-
-Example:
-```markdown
-# Twitter Thread
-*Source: https://example.com/article*
-*Generated: 2026-02-01*
-
----
-
-1/ Opening hook that draws you in...
-
-2/ Personal observation or story...
-
-[... rest of thread ...]
-
----
-
-## Notes
-- Story-driven structure
-- No hype language
-- Humanly tone throughout
-```
-
----
-
-## Advanced Usage
-
-### Custom Output Directory
-```bash
-humanly notes.md twitter -o ~/Dropbox/content
-# Saves to: ~/Dropbox/content/twitter_2026-02-01.md
-```
-
-### Batch Processing
-```bash
-for url in url1 url2 url3; do
-  humanly "$url" twitter
-done
-```
-
-### Integration with Other Tools
-```bash
-# With whisper (voice transcription)
-whisper note.m4a --output_format txt | humanly linkedin
-
-# With clipboard (macOS)
-pbpaste | humanly twitter
-```
-
----
-
-## Documentation
-
-- [README.md](README.md) - This file (complete guide)
-- [EXAMPLES.md](EXAMPLES.md) - Real transformation examples
-- [STYLE_GUIDE.md](STYLE_GUIDE.md) - The humanly voice (optional)
-- [CONTRIBUTING.md](CONTRIBUTING.md) - How to contribute
-- [CHANGELOG.md](CHANGELOG.md) - Version history
+- `README.md` - This file
+- `EXAMPLES.md` - Real transformations
+- `STYLE_GUIDE.md` - What makes content "humanly"
+- `CONTRIBUTING.md` - How to contribute
+- `CHANGELOG.md` - Version history
 
 ---
 
 ## Troubleshooting
 
-### "No output file created"
+**No output created?**
 - Check OpenClaw is running: `openclaw status`
-- Verify the agent processed your request: `ls ~/.humanly/requests/`
+- Check requests were created: `ls ~/.humanly/requests/`
 
-### "Command not found"
-- Run `./install.sh` or add `~/humanly` to PATH manually
-- Verify: `which humanly`
+**Command not found?**
+- Run `./install.sh` or add to PATH manually
 
-### "Cannot read file"
+**Can't read file?**
 - Check file exists: `ls -la yourfile.md`
-- Verify file is readable: `cat yourfile.md`
-
-### "URL fetch failed"
-- Check internet connection
-- Try opening URL in browser first
-- Some sites block automated requests
 
 ---
 
 ## Contributing
 
-Contributions welcome! Please read [CONTRIBUTING.md](CONTRIBUTING.md) first.
+Bug reports, examples, and documentation improvements welcome.
 
-**Ways to contribute:**
-- Report bugs or suggest features (GitHub Issues)
-- Improve documentation
-- Share example transformations
-- Enhance the style guidelines
+See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ---
 
 ## License
 
-MIT License - See [LICENSE](LICENSE) for details.
+MIT - See [LICENSE](LICENSE)
 
 ---
 
 ## Credits
 
-Created by **doc (Karan Singh)** - Co-Founder & CTO, Scogo.AI
+Made by doc (Karan Singh)
 
-Built with:
-- [OpenClaw](https://github.com/openclaw/openclaw) - Agent system
-- [Claude](https://www.anthropic.com/claude) - AI transformation
-
-Inspired by the need for authentic, value-driven content in a world of hype and FOMO.
+Built to share knowledge without the typical social media noise.
 
 ---
 
-## Support
-
-- **Documentation:** Read [EXAMPLES.md](EXAMPLES.md) for detailed examples
-- **Style Guide:** See [STYLE_GUIDE.md](STYLE_GUIDE.md) for the humanly voice
-- **Issues:** Open an issue on GitHub
-- **Community:** Join the OpenClaw Discord
-
----
-
-**Transform anything, anywhere, anytime.** 🦅
-
-*Version 2.0 - No hype. Just value.*
+**Version 2.1.0**

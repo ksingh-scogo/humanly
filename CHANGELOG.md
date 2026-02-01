@@ -4,6 +4,30 @@ All notable changes to humanly will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [2.1.1] - 2026-02-01
+
+### 🔄 README Simplification
+
+**Major documentation cleanup** - Removed promotional language and over-emphasis on dependencies.
+
+### Changed
+
+- **README.md** - Complete rewrite for clarity and brevity
+  - From 404 lines → 174 lines (57% reduction)
+  - Removed excessive OpenClaw promotion
+  - Straightforward, no-nonsense documentation
+  - Focused on what humanly does, not dependencies
+  - Clear examples with before/after
+  - Honest about requirements without over-selling
+
+### Why
+
+User feedback: "You're promoting OpenClaw like anything... be true to yourself."
+
+The old README read like marketing copy. The new one is direct, honest, and focused on the tool itself.
+
+---
+
 ## [2.1.0] - 2026-02-01
 
 ### 🎉 Open Source Release - Major Cleanup

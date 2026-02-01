@@ -4,7 +4,7 @@
 # Author: doc (Karan Singh)
 # Note: This is a wrapper that communicates with OpenClaw agent
 
-VERSION="2.1.0"
+VERSION="2.1.1"
 OUTPUT_DIR="./output"
 
 show_help() {
