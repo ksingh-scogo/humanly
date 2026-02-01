@@ -1,0 +1,281 @@
+#!/bin/bash
+
+# humanly - Transform social media content into authentic, value-driven posts
+# Author: doc (Karan Singh)
+# Note: This is a wrapper that communicates with OpenClaw agent
+
+VERSION="2.1.0"
+OUTPUT_DIR="./output"
+
+show_help() {
+    printf "humanly v%s - Authentic Content Transformer 🦅\n\n" "$VERSION"
+    
+    printf "USAGE:\n"
+    printf "    humanly <input> <platform> [options]\n\n"
+    
+    printf "IMPORTANT:\n"
+    printf "    Output filenames are AUTO-GENERATED as {platform}_YYYY-MM-DD.md\n"
+    printf "    You do NOT specify the output filename.\n\n"
+    
+    printf "INPUT TYPES:\n"
+    printf "    URL         - https://... (fetch from web)\n"
+    printf "    File        - path/to/file.md or file.txt\n"
+    printf "    Text        - \"raw text or paragraph\"\n"
+    printf "    Stdin       - echo \"text\" | humanly twitter\n\n"
+    
+    printf "PLATFORMS:\n"
+    printf "    twitter    - Generate Twitter/X thread (default)\n"
+    printf "    linkedin   - Generate LinkedIn post\n"
+    printf "    blog       - Generate blog post\n"
+    printf "    all        - Generate all formats\n\n"
+    
+    printf "OPTIONS:\n"
+    printf "    -o DIR     - Output directory (default: ./output)\n"
+    printf "    -r         - Refine/regenerate existing content\n"
+    printf "    -h         - Show this help\n"
+    printf "    -v         - Show version\n\n"
+    
+    printf "EXAMPLES:\n"
+    printf "    # Transform URLs\n"
+    printf "    humanly \"https://youtube.com/watch?v=...\" twitter\n"
+    printf "    humanly \"https://reddit.com/r/...\" linkedin\n\n"
+    
+    printf "    # Refine existing markdown\n"
+    printf "    humanly output/twitter_2026-02-01.md twitter -r\n"
+    printf "    humanly output/linkedin_2026-02-01.md linkedin\n\n"
+    
+    printf "    # Transform raw text\n"
+    printf "    humanly \"I learned Claude Code shortcuts today...\" twitter\n\n"
+    
+    printf "    # Pipe input\n"
+    printf "    cat notes.txt | humanly linkedin\n"
+    printf "    echo \"Quick thought...\" | humanly twitter\n\n"
+    
+    printf "HOW IT WORKS:\n"
+    printf "    1. You provide: URL, file, or text\n"
+    printf "    2. humanly detects input type automatically\n"
+    printf "    3. Agent transforms content in humanly style\n"
+    printf "    4. Output saved to ./output/\n\n"
+    
+    printf "SUPPORTED SOURCES:\n"
+    printf "    - URLs: Reddit, X/Twitter, YouTube, blogs\n"
+    printf "    - Files: .md, .txt (any text file)\n"
+    printf "    - Raw text: paragraphs, notes, thoughts\n"
+    printf "    - Stdin: pipe from other commands\n\n"
+    
+    printf "OUTPUT:\n"
+    printf "    Files saved to: ./output/{platform}_YYYY-MM-DD.md\n"
+    printf "    Refine mode adds: _refined suffix\n\n"
+    
+    printf "REQUIREMENTS:\n"
+    printf "    - OpenClaw gateway running\n"
+    printf "    - Internet connection (for URLs only)\n\n"
+    
+    printf "COMMON MISTAKES:\n"
+    printf "    ❌ humanly input.md output.md     (wrong: 2nd arg is platform, not filename)\n"
+    printf "    ✅ humanly input.md twitter        (right: auto-generates filename)\n\n"
+    printf "    ❌ humanly notes.md                (unclear: which platform?)\n"
+    printf "    ✅ humanly notes.md linkedin       (right: explicit platform)\n\n"
+    
+    printf "LEARN MORE:\n"
+    printf "    Full docs: ~/humanly/README.md\n"
+    printf "    Quick ref: ~/humanly/SYNTAX.md\n\n"
+}
+
+# Detect input type
+detect_input_type() {
+    local input="$1"
+    
+    # Check if stdin
+    if [ -z "$input" ] && [ ! -t 0 ]; then
+        echo "stdin"
+        return
+    fi
+    
+    # Check if file exists
+    if [ -f "$input" ]; then
+        echo "file"
+        return
+    fi
+    
+    # Check if URL
+    if [[ "$input" =~ ^https?:// ]]; then
+        echo "url"
+        return
+    fi
+    
+    # Otherwise treat as text
+    echo "text"
+}
+
+# Main function
+main() {
+    # Check for stdin or no args
+    if [ $# -eq 0 ] && [ -t 0 ]; then
+        show_help
+        exit 0
+    fi
+    
+    # Parse arguments
+    local input=""
+    local platform="twitter"
+    local output_dir="$OUTPUT_DIR"
+    local refine_mode=false
+    
+    while [ $# -gt 0 ]; do
+        case "$1" in
+            -h|--help)
+                show_help
+                exit 0
+                ;;
+            -v|--version)
+                printf "humanly v%s\n" "$VERSION"
+                exit 0
+                ;;
+            -o|--output)
+                output_dir="$2"
+                shift 2
+                ;;
+            -r|--refine)
+                refine_mode=true
+                shift
+                ;;
+            twitter|linkedin|blog|all)
+                platform="$1"
+                shift
+                ;;
+            *)
+                if [ -z "$input" ]; then
+                    input="$1"
+                fi
+                shift
+                ;;
+        esac
+    done
+    
+    # Detect input type
+    local input_type=$(detect_input_type "$input")
+    local content=""
+    local source_desc=""
+    
+    case "$input_type" in
+        stdin)
+            content=$(cat)
+            source_desc="stdin"
+            ;;
+        file)
+            if [ ! -r "$input" ]; then
+                printf "Error: Cannot read file: %s\n" "$input" >&2
+                exit 1
+            fi
+            content=$(cat "$input")
+            source_desc="file: $input"
+            ;;
+        url)
+            content="URL_TO_FETCH: $input"
+            source_desc="URL: $input"
+            ;;
+        text)
+            content="$input"
+            source_desc="raw text"
+            ;;
+    esac
+    
+    if [ -z "$content" ] && [ "$input_type" != "url" ]; then
+        printf "Error: No input provided\n" >&2
+        show_help
+        exit 1
+    fi
+    
+    # Create request file for OpenClaw agent
+    mkdir -p ~/.humanly/requests
+    local request_id=$(date +%s)
+    local request_file=~/.humanly/requests/${request_id}.txt
+    
+    # Determine output filename
+    local output_suffix=""
+    if [ "$refine_mode" = true ]; then
+        output_suffix="_refined"
+    fi
+    local output_file="${output_dir}/${platform}_$(date +%Y-%m-%d)${output_suffix}.md"
+    
+    # Create the request based on input type
+    if [ "$input_type" = "url" ]; then
+        cat > "$request_file" << EOREQ
+Transform this URL into ${platform} post(s) using the humanly style:
+
+URL: ${input}
+Platform: ${platform}
+
+Guidelines:
+- Story-driven, not hype
+- No FOMO, no clickbait
+- Pure value and wisdom
+- Soft, simple language
+- Humanly tone (like a wise friend)
+
+For twitter: Create a thread (3-7 tweets, 280 chars each)
+For linkedin: Create a post (1500-2500 chars, story-driven)
+For blog: Create a blog post (800-1500 words, structured)
+
+Save the output to: ~/humanly/${output_file}
+EOREQ
+    else
+        cat > "$request_file" << EOREQ
+Transform this content into ${platform} post(s) using the humanly style:
+
+Platform: ${platform}
+${refine_mode:+Mode: REFINE (regenerate/improve existing content)}
+
+Guidelines:
+- Story-driven, not hype
+- No FOMO, no clickbait
+- Pure value and wisdom
+- Soft, simple language
+- Humanly tone (like a wise friend)
+
+For twitter: Create a thread (3-7 tweets, 280 chars each)
+For linkedin: Create a post (1500-2500 chars, story-driven)
+For blog: Create a blog post (800-1500 words, structured)
+
+CONTENT:
+---
+${content}
+---
+
+Save the output to: ~/humanly/${output_file}
+EOREQ
+    fi
+    
+    printf "═══════════════════════════════════════\n"
+    printf "   🦅 humanly v%s - Content Transformer\n" "$VERSION"
+    printf "═══════════════════════════════════════\n\n"
+    printf "📥 Request submitted to OpenClaw agent\n"
+    printf "Source: %s\n" "$source_desc"
+    printf "Type: %s\n" "$input_type"
+    printf "Platform: %s\n" "$platform"
+    if [ "$refine_mode" = true ]; then
+        printf "Mode: REFINE\n"
+    fi
+    printf "\n"
+    printf "Processing...\n"
+    printf "The agent will:\n"
+    if [ "$input_type" = "url" ]; then
+        printf "1. Fetch content from the URL\n"
+    else
+        printf "1. Read the provided content\n"
+    fi
+    printf "2. Transform it in humanly style\n"
+    printf "3. Save to ~/humanly/%s\n\n" "$output_file"
+    
+    # Output the request for the agent to pick up
+    cat "$request_file"
+    
+    printf "\n═══════════════════════════════════════\n"
+    printf "   ✓ Request sent to agent\n"
+    printf "═══════════════════════════════════════\n\n"
+    printf "Check the output directory for results.\n\n"
+}
+
+# Run main
+main "$@"
