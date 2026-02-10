@@ -6,25 +6,26 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [2.1.1] - 2026-02-01
 
-### 🔄 README Simplification
+### 🔄 README Honesty Pass
 
-**Major documentation cleanup** - Removed promotional language and over-emphasis on dependencies.
+**Being honest about dependencies** - User feedback driven.
 
 ### Changed
 
-- **README.md** - Complete rewrite for clarity and brevity
-  - From 404 lines → 174 lines (57% reduction)
-  - Removed excessive OpenClaw promotion
-  - Straightforward, no-nonsense documentation
-  - Focused on what humanly does, not dependencies
-  - Clear examples with before/after
-  - Honest about requirements without over-selling
+- **README.md** - Honest about what humanly actually requires
+  - Added LLM requirement (it doesn't work without one)
+  - Clarified humanly is a wrapper, not the transformer
+  - Added Prerequisites section to Install
+  - Restored OpenClaw check in Troubleshooting (it's needed)
+  - Updated Credits to reflect collaboration
+  - Removed Contributing section
+  - From 404 lines → 171 lines
 
 ### Why
 
-User feedback: "You're promoting OpenClaw like anything... be true to yourself."
+User feedback: "Does it require LLM to work?"
 
-The old README read like marketing copy. The new one is direct, honest, and focused on the tool itself.
+Yes. humanly creates request files - it needs an LLM agent to actually transform content. Being upfront about this now.
 
 ---
 

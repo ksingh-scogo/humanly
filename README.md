@@ -8,6 +8,10 @@ A bash script that turns content into Twitter threads, LinkedIn posts, or blog a
 
 ## Install
 
+**Prerequisites:**
+- [OpenClaw](https://github.com/openclaw/openclaw) installed and running
+
+**Then:**
 ```bash
 git clone https://github.com/yourusername/humanly.git
 cd humanly
@@ -98,14 +102,17 @@ See [EXAMPLES.md](EXAMPLES.md) for more.
 
 humanly is a bash wrapper that:
 1. Reads your input (URL, file, or text)
-2. Sends transformation request to an AI agent
-3. Applies the "humanly" style (no hype, story-driven, simple)
-4. Removes common AI writing patterns
-5. Saves output to markdown file
+2. Creates a transformation request file
+3. An LLM agent picks up the request and:
+   - Applies the "humanly" style (no hype, story-driven, simple)
+   - Removes common AI writing patterns
+   - Saves output to markdown file
 
 **Requirements:**
-- [OpenClaw](https://github.com/openclaw/openclaw) running (provides the AI agent)
+- An LLM agent running (currently uses OpenClaw with Claude)
 - Internet connection (for URLs only)
+
+**Note:** humanly doesn't transform content itself - it creates requests for an LLM to process.
 
 ---
 
@@ -138,7 +145,7 @@ humanly notes.md linkedin   # Explicit platform
 ## Troubleshooting
 
 **No output created?**
-- Check OpenClaw is running: `openclaw status`
+- Check OpenClaw agent is running: `openclaw status`
 - Check requests were created: `ls ~/.humanly/requests/`
 
 **Command not found?**
@@ -146,14 +153,6 @@ humanly notes.md linkedin   # Explicit platform
 
 **Can't read file?**
 - Check file exists: `ls -la yourfile.md`
-
----
-
-## Contributing
-
-Bug reports, examples, and documentation improvements welcome.
-
-See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ---
 
@@ -165,10 +164,8 @@ MIT - See [LICENSE](LICENSE)
 
 ## Credits
 
-Made by doc (Karan Singh)
-
-Built to share knowledge without the typical social media noise.
+Designed by Karan Singh in Navi Mumbai, Assembled by OpenClaw (beast) in a VM
 
 ---
 
-**Version 2.1.0**
+**Version 2.1.1**
